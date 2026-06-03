@@ -5,7 +5,7 @@ const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 })
 
-const MODEL = 'claude-sonnet-4-5'
+const MODEL = 'claude-sonnet-4-6'
 
 export async function analyzePolicyCoverage(
   policyText: string,
@@ -114,6 +114,11 @@ export async function generateDisputeLetter(
     rejected: 'Claim has been rejected',
     reopen: 'Settlement accepted but I want to reopen it',
   }
+  const lossAdjusterLabels: Record<string, string> = {
+    not_yet: 'No loss adjuster has visited yet',
+    visited: 'A loss adjuster has visited',
+    visited_disagreed: 'A loss adjuster visited and I disagreed with their assessment',
+  }
 
   const message = await client.messages.create({
     model: MODEL,
@@ -141,14 +146,14 @@ Do not provide legal or regulated insurance advice.`,
     messages: [
       {
         role: 'user',
-        content: `Insurance Type: ${insuranceTypeLabels[formData.insuranceType] || formData.insuranceType}
-Damage Cause: ${damageCauseLabels[formData.damageCause] || formData.damageCause}
+        content: `Insurance Type: ${insuranceTypeLabels[formData.insuranceType] ?? formData.insuranceType}
+Damage Cause: ${damageCauseLabels[formData.damageCause] ?? formData.damageCause}
 Damage Date: ${formData.damageDate}
-Settlement Offered: €${formData.settlementOffered || 0}
-Estimated Loss: €${formData.estimatedLoss || 0}
-Claim Status: ${claimStatusLabels[formData.claimStatus] || formData.claimStatus}
+Settlement Offered: €${formData.settlementOffered ?? 0}
+Estimated Loss: €${formData.estimatedLoss ?? 0}
+Claim Status: ${claimStatusLabels[formData.claimStatus] ?? formData.claimStatus}
+Loss Adjuster Status: ${lossAdjusterLabels[formData.lossAdjusterStatus] ?? formData.lossAdjusterStatus}
 Damage Description: ${formData.damageDescription}
-Loss Adjuster Status: ${formData.lossAdjusterStatus}
 
 Policy Analysis Summary:
 ${policyAnalysis.slice(0, 3000)}
