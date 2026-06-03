@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['pdf-lib']
-  }
+  // pdf-parse wraps pdf.js and must run in the Node.js runtime, not bundled
+  serverExternalPackages: ['pdf-parse'],
 }
 
 module.exports = nextConfig
